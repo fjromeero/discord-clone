@@ -27,13 +27,14 @@ target_metadata = SQLModel.metadata
 # my_important_option = config.get_main_option("my_important_option")
 # ... etc.
 
+from app.core.config import settings
 
 def get_url():
-    user = os.getenv("POSTGRES_USER", "postgres")
-    password = os.getenv("POSTGRES_PASSWORD", "")
-    server = os.getenv("POSTGRES_SERVER", "db")
+    user = os.getenv("POSTGRES_USER", settings.POSTGRES_USER)
+    password = os.getenv("POSTGRES_PASSWORD",  settings.POSTGRES_PASSWORD)
+    server = os.getenv("POSTGRES_SERVER", "localhost")
     port = os.getenv("POSTGRES_PORT", "5432")
-    db = os.getenv("POSTGRES_DB", "app")
+    db = os.getenv("POSTGRES_DB", settings.POSTGRES_DB)
     return f"postgresql+psycopg://{user}:{password}@{server}:{port}/{db}"
 
 
