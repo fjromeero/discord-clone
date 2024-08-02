@@ -11,14 +11,14 @@ from app.models.token import Token
 from app.models.message import Message
 from app.utils import mail as MailService
 
-router = APIRouter()
+router = APIRouter(prefix='/auth')
 
 
 @router.post('/register')
 def register(
     session: SessionDep,
     user_in: UserCreate,
-) -> Any:
+) -> Message:
     """
     Register a new user.
     """
@@ -48,6 +48,22 @@ def register(
         )
     
     user = UserCrud.create_user(session=session, user_create=user_in)
+    
+    verification_token = security.generate_password_reset_token(email=user.email)
+    email_data = MailService.generate_account_verification_email(
+        email_to=user.email,
+        username=user.username,
+        token=verification_token
+    )
+    MailService.send_email(
+        email_to=user.email,
+        html_content=email_data.html_content,
+        subject=email_data.subject
+    )
+    
+    return Message(
+        message='Account verification email has been sent'
+    )
 
 
 @router.post("/login/access-token")
@@ -74,7 +90,7 @@ def login_access_token(
     )
 
 
-@router.post("/auth/forgot")
+@router.post("/forgot")
 def forgot_password(
     session: SessionDep, email: str
 ) -> Message:
@@ -128,3 +144,30 @@ def reset_password(session: SessionDep, body: ResetUserPassword) -> Message:
     UserCrud.update_user_password(session=session, user=user, password=body.new_password)
 
     return Message(message="Password updated successfully")
+
+
+@router.post("/verify-account")
+def verify_account(session: SessionDep, body: ResetUserPassword) -> Message:
+    """
+    Verify user account
+    """
+    
+    email = security.verify_password_reset_token(token=body.token)
+    
+    if not email:
+        raise HTTPException(status_code=404, detail='Invalid token')
+    
+    user = UserCrud.get_user_by_email(session=session, email=email)
+
+    if not user:
+        raise HTTPException(
+            status_code=404,
+            detail='Email does not exist'
+        )
+        
+    UserCrud.verify_user_account(session=session, user=user)
+    
+    return Message(
+        message='Account verified successfully'
+    )
+    

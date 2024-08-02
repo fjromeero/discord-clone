@@ -50,4 +50,9 @@ def update_user_password(*, session: Session, user: User, password: str):
     user.hashed_password=hashed_password
     session.add(user)
     session.commit()
-
+    
+    
+def verify_user_account(*, session: Session, user: User):
+    user.verified = True
+    session.add(user)
+    session.commit()

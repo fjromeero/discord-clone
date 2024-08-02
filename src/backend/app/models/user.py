@@ -11,6 +11,7 @@ class UserBase(SQLModel):
     state: str = Field(max_length=50, default="online")
     about_me: str | None = Field(max_length=255, default=None)
     birth_date: datetime
+    verified: bool = Field(default=False)
 
 
 class UserCreate(UserBase):
@@ -30,3 +31,7 @@ class User(UserBase, table=True):
 class ResetUserPassword(SQLModel):
     token: str
     new_password: str = Field(min_length=8, max_length=40)
+    
+
+class VerifyAccount(SQLModel):
+    token: str

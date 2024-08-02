@@ -44,6 +44,24 @@ def generate_reset_password_email(email_to: str, username: str, token: str) -> E
     return EmailData(html_content=html_content, subject=subject)
 
 
+def generate_account_verification_email(email_to: str, username: str, token: str) -> EmailData:
+    project_name = settings.PROJECT_NAME
+    subject = f'{project_name} - Account verification for user {username}'
+    link = f'{settings.server_host}/verify-account?token={token}'
+    html_content = render_email_template(
+        template_name='verify_account.html',
+        context={
+            "project_name": project_name,
+            "username": username,
+            "email": email_to,
+            "valid_hours": settings.EMAIL_RESET_TOKEN_EXPIRE_HOURS,
+            "link": link,
+        }
+    )
+    
+    return EmailData(html_content=html_content, subject=subject)
+
+
 def send_email(
     *,
     email_to: str,
