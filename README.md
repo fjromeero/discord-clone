@@ -19,12 +19,21 @@ with this, so just execute from the backend directory:
 ```
 
 ## 3. Post-configuration of the app
-### 3.1 Backend
+### 3.1 Environment variables
+A template file named `.env.example`  is provided, which includes the required environment variables. If you need to create separate environment files for different stages (e.g., development, production, etc.), you can use the script `generate_new_env_file.sh` located in the `scripts` folder at the root directory. This script will copy the template and create a new environment file with the specified name. Additionally, it will generate a symbolic link to another file, ensuring that the frontend can access the same environment variables.
+
+To use the script, run:
+
+```bash
+./generate_new_env_file.sh
+```
+
+### 3.2 Backend
 We need to create the tables on the database:
 ```bash
 ./scripts/prestart.sh
 ```
-#### 3.1.1. Imports troubleshouting
+#### 3.2.1. Imports troubleshouting
 In case of imports troubles, it can be because in the environment variable is not the base path of the project:
 ```bash
 export PYTHONPATH=$PYTHONPATH:$(pwd)
