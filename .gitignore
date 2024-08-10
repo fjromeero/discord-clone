@@ -1,3 +1,9 @@
 __pycache__
 venv
+
+# Ignorar todos los archivos .env
 .env
+.env.*
+
+# No ignorar .env.example
+!.env.example
